@@ -7,6 +7,6 @@ los tipos de aprendizaje (supervisado y no supervisado)
 Se realiza una introducción sobre la libreria Pandas para el procesamiento de estructuras
 Series y DataFrames en Python.
 + 02 - Supervisado 1
-Se exploran los conceptos relacioandos con: overfitting, underfitting, las métricas
-de evaluación, el algoritmo de KNNN. 
+Se exploran los conceptos relacionados con: overfitting, underfitting, las métricas
+de evaluación, el algoritmo de KNN. 
 + 03 - Supervisado 2
