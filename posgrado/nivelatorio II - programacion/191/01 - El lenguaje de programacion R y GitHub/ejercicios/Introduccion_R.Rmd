@@ -1,0 +1,412 @@
+---
+title: "Introducción a R"
+author: "Christian Urcuqui"
+date: "24 de septiembre de 2018"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+  
+---
+
+
+##Introducción
+
+
+![](../Utilities/r.jpeg)
+<br>
+
+En este notebook se presentará una introducción a la programación en R para su uso en proyectos de ciencia de datos.
+
+
+###Motivación
+
+Debido a los grandes volumenes de información que se presentan hoy en día la forma de analizar los datos ha estado cambiando. Algunas personas han mencionado que "Los datos son el petróleo del siglo xxi".
+
+La ciencia de datos a partir de sus técnicas (por ejemplo, estadísticas, visuales, econométricas y de aprendizaje de máquina) han permitido descubrir y explotar la información. 
+
+Antiguamente, los investigadores solían publicar sus resultados en prestigiosas revistas y la implementación de sus descubrimientos en software tomaba mucho tiempo.
+
+Actualmente, los investigadores y la industria han mejorado sus métodos en conjunto con la implementación de software, estos resultados ahora se encuentran en sitios web de fácil acceso (en muchos casos con licencia open source)
+
+###R 
+
+R es un entorno y un lenguaje para computación estadística y gráfica desarrollado en Bell Labs, un proyecto que surge de la implemententación del software libre S. Nace en el depto. de estadística de la Universidad de Auckland, Nueva Zelanda (Ross Ihaka and Robert Gentleman) en el año de 1993.
+
+
+Una solución open source para análisis de datos soportado por varias comunidades científicas en todo el mundo.
+
+R tiene muchas ventajas frente a los otros software comerciales de alto costo para uso de análisis de datos, estas son:
+
++ Es una tecnología gratuita a diferencia de otros software comerciales de altos costos.
++ Tiene comunidades muy activas, casi semanalmente se proponen nuevos paquetes estadísticos y actualizaciones, lo cual a llevado a los sistemas comerciales a integrar R.  
++ Es más fácil la automatización ya que se pueden desarrollar scripts (líneas de código con un propósito especifico) que permiten ejecutar el análisis varias veces.
++ Leer casi cualquier tipo de datos (.txt, .csv, .dat), también, existen paquetes que permiten leer información de archivos JSON, Excel, STATA, SAS. E incluso utilizar datos de sitios web y de sistemas de base de datos (Por ejemplo, MySQL y, PostgresSQL)
+
+
+##Descarga e instalación de R
+
+Como hemos mencionado, R es un proyecto __open source__, su descarga se puede encontrar en el sitio web de Comprehensive R Archive Network (CRAN):
+
+http://cran.r-project.org.
+
+De la anterior página podemos descargar los archivos binarios para instalación en sistemas opertivos Linux, Mac OS X, y Windows. 
+
+
+## Trabajando con R
+
+R es un lenguaje interpretado, es decir, que podemos digitar un comando a la vez con  R o se puede ejecutar un archivo que contenga las líneas de código y el interprete ejecutará linea por linea . 
+
+Muchos de los datos y variables son almacenadas en memoria durante una sesión. Nosotros podemos guardar una sesión con la finalidad de conservar nuestro trabajo para futuras sesiones. 
+
+R utiliza el símbolo __<-__ para detonar una asignación, a diferencia del típico = utilizado en muchos otros lenguajes de programación, a continuación, verá un ejemplo de una asignación a la variable _x_, a esta variable se le asigna un vector de 5 valores a través de la función rnorm (el llamado a funciones lo veremos más adelante en este mismo notebook).
+
+```
+x <- rnorm(5)
+```
+
+Por favor escriba el anterior ejemplo y ejecutelo en el próximo espacio de código.
+
+_Ejercicio 1_
+```{r example1}
+## Escriba el ejemplo en el siguiente espacio (1 línea de código) ##
+
+# --------------------------- #
+x
+
+```
+
+Los comentarios sobre el código podemos agregarlos con _#_.
+
+Ahora, si deseamos obtener mayor información sobre una función podemos utilizar la opción de ayuda con R a través de _?_, ejecute el siguiente ejemplo en su consola.
+```
+?rnorm
+
+```
+
+Como hemos mencionado, la aplicación de la función rnorm nos dio un vector de cinco valores. Ahora si deseamos crear un vector con unos valores especificos y asignarlo a una variable, debemos proceder a digitar la función _c_ seguido de los valores que queremos tener dentro de _()_ y cada valor separado por _,_, por favor, digite el siguiente ejemplo en el espacio de código.  
+
+```
+vector <- c(1,4,5,6)
+
+```
+_Ejercicio 2_
+```{R example2}
+# Digite el ejemplo del vector en el siguiente espacio (1 línea de código)
+
+# --------------------------- #
+vector
+
+```
+Hemos creado un vector de cuatro valores y lo hemos asignado a la variable _vector_.
+
+
+Procesamos a un tercer ejercicio, vamos a crear una tabla a través de la asignación de vectores, utilizaremos unas funciones predefinidas en R para estadística descriptiva y vamos a crear un gráfico. 
+Por favor, cree dos vectores para las columnas __Age (mo.)__ y __Weight (kg.)__.
+
+
+![](../Utilities/R/table.png)
+
+_Ejercicio 3_
+
+```{R example3}
+# Por favor escriba los dos vectores en el siguiente espacio (2 lineas de código)
+
+
+# --------------------------- #
+print("Vector de Age")
+age
+print("Vector de Weight")
+weight
+print("Desviación estandar")
+sd(weight)
+print("Correlación entre age y weight")
+cor(age, weight)
+print("gráfico de age versus weight")
+plot(age, weight)
+
+```
+
+
+##Paquetes
+
+Existen numerosas funciones de R en distintos paquetes que nos pueden facilitar la vida. La instalación de un paquete se realiza a través de:
+
+```
+install.packages("nombre del paquete")
+```
+Como hemos mencionado, constantemente las comunidades lanzan nuevas versiones de sus paquetes ya sea para incorporar nuevas funcionalidades o para corregir algún error; si deseamos estar en la ultima versión podemos utilizar el siguiente comando: 
+
+```
+update.packages()
+```
+
+Para cargar el paquete que necesitamos utilizar en nuestro entorno de trabajo debe utilizar el siguiente comando en conjunto con el nombre del paquete
+```
+library(gclus) 
+```
+Para este siguiente ejercicio escriba las lineas de código que permitan instalar los paquetes "tidyverse" y "nycflights13", luego cargue ambos al entorno de trabajo.
+
+Es probable que el paquete ya se encuentre instalado. 
+
+_Ejercicio 4_
+```{R example4}
+# Escriba el código que permita instalar y cargar los dos paquetes (cuatro líneas)
+
+
+
+
+# --------------------------- #
+
+```
+
+##Funciones
+
+Cada paquete trae consigo una serie de funciones y la única forma de acceder a estas utilidades es cargan paquete a paquete a nuestro entorno de trabajo, la estructura general de función puede interpretarse de la siguiente manera:
+```
+nombre_funcion(parametro1 = valor1, parametro2 = valor2, ...)
+```
+Para nuestro próximo ejercicio utilizaremos la función _seq_, por favor utilice la opción de ayuda en la consola y luego en el siguiente cuadro de código digite una línea que utilice la función para crear un vector de valores del 1 hasta el 10.
+
+_Ejercicio 5_
+```{R example5}
+# Escriba el código que utilice la funcion seq y cree un vector de valores del 1 hasta el 10 (1 línea de código)
+
+# --------------------------- #
+vector
+
+```
+
+##Exploración de datos
+
+Vamos a utilizar un conjunto de datos ( __dataset__ ) de los vuelos realiados en la ciudad de Nueva York en 2013. Vamos a ejecutar el siguiente código que nos permitirá ver nuestro data.frame 
+
+```{R provided}
+# La siguiente línea de código especifica que vamos a utilizar "flights" del paquete nycflights13, esto se realiza con la finalidad que no se presenten problemas si hay más variables "flights" en nuestro entorno de trabajo.
+nycflights13::flights
+flights
+```
+
+Con la finalidad que podamos tener una primera idea de nuestros datos, vamos a utilizar la función str, en primer lugar, escriba la ayuda de _?str_ y obtenga más información de esta.
+
+Ahora digite la función str sobre el objeto flights.
+
+_Ejercicio 6_
+```{R example6}
+# Escriba el código que utilice la funcion str en el objeto flights (1 línea de código)
+
+# --------------------------- #
+```
+
++ ¿Que puede inferir a través de la anterior función?
++ Observe la cantidad de registros y variables
++ observe los tipos de variables 
+
+Flights es un tipo de estructura en R conocida como data.frame. Si deseamos conocer el tipo de objeto con el cual estamos trabajando podemos obtener este tipo de información a través de la función _class()_. Digite el siguiente código en su consola de comandos.
+
+```
+class(flights)
+```
+Ahora, también podemos ver la información de nuestro data.frame como si fuera una hoja de trabajo en Excel. Utilice el siguiente código en su consola de comandos de RStudio.
+```
+View(flights)
+```
+
+Vamos a utilizar otras funciones y operaciones en R que nos permitan filtrar y hacer operaciones en los datos. A continuación, se muestra una tabla con la lista de operaciones tanto aritméticas como lógicas que se pueden realizar entre los objetos de R.
+
+
+![](../Utilities/R/operations.png)
+
+Hagamos unas operaciones básicas, nosotros podemos utilizar R como una especie de "calculadora"" (muy parecido a la operación entre celdas en Excel). En el siguiente cuadro de código hay unas variables númericas con valores ya asignados con el fin que usted pueda realizar las siguientes operaciones:
+
++ x + y 
++ x * y 
++ -x
++ sqrt(x)
++ x == y
++ x != y
+
+_Ejercicio 7_
+
+```{R example7}
+#Ejecute las siguientes tres líneas de código para crear las variables 
+x = c(1, 2, 4, 7, 9, 0)
+y = 4
+z = c(0.5, 2, 3, 5, 1, 0)
+
+# Escriba en el siguiente espacio la operación suma entre "x" y "y", y asígnelo a resultado_suma (1 línea de código)
+resultado_suma <- 
+# Escriba en el siguiente espacio la operación multiplicación entre "x" y "z", y asígnelo a resultado_multiplicacion (1 línea de código)
+resultado_multiplicacion <- 
+# Escriba en el siguiente espacio la operación multiplicación negativa a "z", y asígnelo a resultado_negativo (1 línea de código)
+resultado_negativo <- 
+# Escriba en el siguiente espacio la operación de raíz cuadrada "y", y asígnelo a resultado_raiz (1 línea de código)
+resultado_raiz <- 
+# Escriba en el siguiente espacio la operación lógica de igualdad entre "x" y "z", y asígnelo a resultado_igualdad (1 línea de código)
+resultado_igualdad <- 
+# Escriba en el siguiente espacio la operación lógica de diferencia entre "x" y "y", y asígnelo a resultado_igualdad (1 línea de código)
+resultado_diferencia <- 
+
+# --------------------------- #
+  
+# Ahora ejecute las siguientes líneas de código que le permitirán observar los resultados de sus operaciones.  
+
+print("Resultado Suma")
+resultado_suma
+print("Resultado multiplicación")
+resultado_multiplicacion
+print("Resultado negativo")
+resultado_negativo
+print("Resultado raíz cuadrada")
+resultado_raiz
+print("Resultado de operación lógica: igualdad")
+resultado_igualdad
+print("Resultado de operación lógica: diferencia")
+resultado_diferencia
+```
+
+Ahora, exploremos la función _filter()_, esta función nos permite obtener un subconjunto de un observaciones de un conjunto más grande basado en los parámetros que le suministremos, vea el siguiente ejemplo. 
+
+```
+filter(flights,  carrier == "UA")
+```
+
+La anterior línea de código nos permite obtener todos los vuelos realizados por una sola aerolínea (para nuestro caso aquella abreviada con "UA").
+
+En la siguiente tabla puede observar la sintaxis para las operaciones lógicas en R.
+
+
+![](../Utilities/R/logical.png)
+
+
+Nosotros podemos realizar varias operaciones lógicas enlazadas entre sí, por ejemplo:
+
+
+```
+filter(flights,  carrier == "B6" & distance <= 1500)
+```
+
+La anterior línea de código nos da los vuelos realizados en el año 2014 y que tuvieron una distancia hasta 1500 millas.
+
+Ahora, le proponemos como ejercicio obtener el subconjunto de datos de los vuelos de la aerolinea "AA" que tuvieron una distancia entre 1300 y 1800 millas.
+
+
+_Ejercicio 8_
+
+```{R example8}
+# Escriba en el siguiente espacio el filtro que permita obtener el subconjunto de vuelos (1 línea de código)
+
+# --------------------------- #
+```
+
+##Cargar archivos y bases de datos
+
+R tienen la capacidad de cargar conjuntos de información en distintos formatos a nuestro entorno de trabajo. En el siguiente ejemplo veremos distintas formas de cargar archivos .csv y de otro tipo a través de comandos y del mismo RStudio, es muy importante conocer previamente el formato del archivo antes de cargarlo (por ejemplo, si los datos vienen separados por ";", "," y " ").
+
+_Cargar archivos con RStudio_
+
+En la sección de "environment"" podemos encontrar una opción "import Dataset" que nos abrirá unas opciones cargar los archivos los distintos tipos de archivos. 
+
+
+![](../Utilities/R/import_dataset.png)
+
+El anterior proceso es simplemente una abstracción de unos pasos que podemos realizar también a través de código en R, debemos tener cuidado con el separador, el tipo de archivo y conocer cuál es la función para cargarlo. A continuación, veremos cómo llamar a la función que nos permitirá abrir el buscador de archivos de nuestro sistema operativo.
+
+```
+file.choose()
+```
+Existen distintas funciones para cargar los archivos, por ejemplo:
+
++ read.csv. Carga un archivo csv con separador ","
++ read.csv2. Carga un archivo csv con separador ";" 
++ read.delim. Carga un archivo con separador "\t"
+
+Ahora, podemos integrar la función que nos da la opción para buscar el archivo en nuestro sistema y luego la encargada de cargarlo en nuestro entorno de trabajo. 
+```
+read.csv2(file.choose())
+```
+Para el siguiente ejercicio cargue el archivo "parks.csv" y asignelo a una variable "df".
+
+_Ejercicio 9_
+
+```{R example9}
+# Escriba en el siguiente espacio el código que permita cargar el archivo parks.csv (1 línea de código)
+
+# --------------------------- #
+```
+
+###Base de datos 
+
+Debido a la amplia gama de tecnologías de base de datos y a la importancia de procesar la mayor cantidad de información; es importante conocer los mecanismos (interfaces) con los cuales podamos integrar los distintos sistemas de información con R, ya que será el medio con el que podremos consultar y procesar los datos que serán luego utilizados en las actividades de la ciencia de datos.
+
+####MySQL
+
+![](../Utilities/mysql.jpg)
+
+
+MYSQL es un sistema de gestión de base de datos relacional. Una de las tecnologías de mayor acogida en el soluciones web (por ejemplo, Joomla, Wordpress y Drupal). 
+
+Existen diversas interfaces de programación de aplicaciones que permiten el acceso a MySQL a distintos lenguajes de programación de programación, por ejemplo, C, C++, Python, Java y R.
+
+Para la interacción de R y MySQL es necesario contar el paquete RMySQL en nuestro entorno de trabajo de R. 
+Es importante tener previamente instalado el sistema de base de datos MySQL en nuestro equipo (por ejemplo, MySQL WorkBench).
+https://dev.mysql.com/downloads
+
+A continuación, se enuncian algunos comandos a tener en cuenta para la configuración y acceso de un usuario a través del paquete RMySQL. 
+
+Existen distintas formas para crear un usuario en el MySQL workbench, para nuestro caso dejaremos un ejemplo de un script en SQL para la creación de un usuario con privilegios sobre un SCHEMA
+```
+CREATE USER 'username'@'localhost' IDENTIFIED BY 'SomethingDifficult';
+GRANT SELECT, INSERT, UPDATE, DELETE, EXECUTE, SHOW VIEW ON database_name.* TO 'username'@'localhost';
+```
+Es importante que el tipo de autenticación sea tipo "Standard", para lograr esto se puede digitar el siguiente script en SQL
+```
+ALTER USER 'username'@'localhost' IDENTIFIED WITH mysql_native_password BY 'SomethingDifficult';
+```
+
+### Paquetes para MySQL
+
+Instalación de paquetes necesarios para el desarrollo de las sesiones 
+
+
+```{r paquetes, echo=FALSE}
+#install.packages("RMySQL")
+
+```
+
+Cargar los paquetes
+
+```{r cargarPaquetes}
+library(RMySQL)
+```
+
+Vamos a conectarnos a través de R a la base de datos MySQL, para ello será necesario utilizar los métodos de RMySQL para definir los datos de nuestra cuenta y contraseña.
+
+```{r conexion}
+# definición de la variable para el password
+# dbname es el nombre de la base de datos creada en el sistema de base de datos MySQL
+# host es el parámetro que define la dirección donde se encuentra hospedada la base de datos, para nuestro caso será en nuestro equipo local "localhost"
+localuserpassword <- "SomethingDifficult"
+#dbConnect es el método que nos permite conectarnos a la base de datos MySQL
+#?dbConnect
+storiesDb <- dbConnect(MySQL(), user='username', password=localuserpassword, dbname='sakila', host='localhost')
+
+# La siguiente linea despliega las tablas de la base de datos cargada
+dbListTables(storiesDb)
+
+# Vamos ahora a pasar la base de datos cargada a un data.frame,< el parámetro name define el nombre de la tabla a procesar
+actor_df <- dbReadTable(conn = storiesDb, name = 'actor')
+head(actor_df)
+
+
+# dbDisconnect es el método que nos permite terminar la conexión con la base de datos
+#?dbDisconnect
+dbDisconnect(storiesDb ) 
+
+```
+
+<h2>Referencias</h2>
+
++ Kabacoff, R. (2015). R IN ACTION: Data analysis and graphics with R
++ Wickham, H., & Grolemund, G. (2016). R for Data Science.
+
