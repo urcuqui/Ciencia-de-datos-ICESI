@@ -101,16 +101,6 @@ vector <- c(1,4,5,6)
 
 ```
 
-_Ejercicio 3_
-```{R example2}
-# Digite el ejemplo del vector en el siguiente espacio (1 línea de código)
-
-# --------------------------- #
-vector
-
-```
-Hemos creado un vector de cuatro valores y lo hemos asignado a la variable _vector_.
-
 Un vector es un objeto de una sola dimensión donde sus valores pueden ser de un sólo tipo, por ejemplo, de tipo caracter, númericos, o lógicos.
 ```{R vector}
 x <-c(0.5, 0.6) # numérico
@@ -125,6 +115,18 @@ x <-c(1+0i, 2+4i) #compleja
 typeof(x)
 ```
 
+_Ejercicio 3_
+
+Escriba un vector de enteros con cuatro elementos
+
+```{R example2}
+# Escriba un vector de enteros con cuatro elementos (1 línea de código)
+
+# --------------------------- #
+vector
+
+```
+Hemos creado un vector de cuatro valores y lo hemos asignado a la variable _vector_.
 
 ##Markdown
 
@@ -262,7 +264,6 @@ _Ejercicio 5_
 
 
 # --------------------------- #
-
 ```
 
 Podemos encontrar más información de paquetes disponibles en la siguiente página:
@@ -295,7 +296,7 @@ vector
 
 ```
 
-Un programador también puede definir sus propias funciones con el fin de crear fragmentos reutilizables de código que pueden ser utilizados en varias partes del proyecto o en otros.
+Un programador también puede definir sus propias funciones con el fin de crear fragmentos reutilizables de código que tienen una función que puede ser reutilizada en varias partes del proyecto o en otros.
 
 
 ```{R example}
@@ -320,6 +321,8 @@ pairList(lista)
 ##Creando un dataset y exploración básica de datos
 
 
+###Vector
+
 Ahora observemos como recorrer un vector
 _Ejercicio 8_
 
@@ -342,9 +345,11 @@ R2/
 
 R3/
 
-_Ejemplo de matriz_
+###Matriz
 
-Son arreglos de dos dimensiones con todos los registros del mismo tipo, ejecute el siguiente código con el fin de observar las diferencias contra un vector de una dimensión
+Son arreglos de dos dimensiones en donde todos los registros son del mismo tipo, ejecute el siguiente código con el fin de observar las diferencias con el vector de una dimensión
+
+_Ejemplo de matriz_
 
 ```{R matrizExample}
 x <- matrix(1:20, nrow=5, ncol=4)
@@ -364,7 +369,7 @@ _Ejercicio 9_
 ```
 
 
-Ahora veamos como obtener los elementos de la matriz, para accederlos escribimos los indices(número) de la siguiente forma [fila, columna]
+Ahora veamos como obtener los elementos de la matriz, para accederlos escribimos los indices(número) de la siguiente forma X[_i_,_j_]$ donde _i_ corresponde al indice de la fila y _j_ al indice de las columnas.
 
 ```{R matrizExample3}
 x[ , 2] #obtenemos los elementos de la segunda columna
@@ -390,32 +395,35 @@ x["R4",]
 
 De la misma forma que en las filas, podemos encontrar la función para las columnas _colnames_.
 
-Existe un tipo de objeto conocido como Factor en donde sus valores son categóricos, específicamente, nominales u ordinales. 
+###Arrays
 
+Los arrays son similares a las matrices pero pueden tener más de dos dimensiones, la forma de crearlo es a través de la siguiente función:
+```
+myarray <- array(vector, dimensions, dimnames)
+```
+_vector_ contiene los datos para el array, _dimensions_ es un vector numérico que expresa el máximo índice para cada dimensión y _dinmanes_ es una lista que es opcional y que contiene las etiquetas. 
 
-```{R factorExample1}
-diabetes <- c("Type1", "Type2", "Type1", "Type1")
-diabetesFactor <- factor(diabetes) 
+_Ejemplo Array_
+En el siguiente ejemplo crearemos un array de tres dimensiones (2x3x4) de números.
+```{R ArrayExample}
+dim1 <- c("A1", "A2")
+dim2 <- c("B1", "B2", "B3")
+dim3 <- c("C1", "C2", "C3", "C4")
+z <- array(1:24, c(2,3,4), dimnames=list(dim1, dim2, dim3))
+z
 ```
 
-Cree el siguiente factor y observe el orden de los niveles
+### Data frames
 
-```{R factorExample2}
-x <- factor(c("yes", "yes", "no", "yes", "no"))
-```
-
-Para cambiar el orden de los niveles se especifica el parámetro "levels" en el orden deseado
-```{R factorExample3}
-x <- factor(c("yes", "yes", "no", "yes", "no"), levels = c("yes", "no"))
-```
-
-Vamos a utilizar un conjunto de datos ( __dataset__ ) de los vuelos realizados en la ciudad de Nueva York en 2013. Ejecutemos el siguiente código que nos permitirá ver nuestro data.frame 
+Vamos a utilizar un conjunto de datos ( __dataset__ ) de los vuelos realizados en la ciudad de Nueva York en 2013. Ejecutemos el siguiente código que nos permitirá ver nuestro data.frame
 
 ```{R provided}
 # La siguiente línea de código especifica que vamos a utilizar "flights" del paquete nycflights13, el uso de :: se realiza con la finalidad que no se presenten problemas si hay más variables "flights" en nuestro entorno de trabajo.
 nycflights13::flights
 flights
 ```
+
+El _Data frame_ es más general que una matriz ya que puede almacenar diferentes tipos de datos (númericos, carácteres, etc.). Es la estructura más utilizada en los proyectos de R. 
 
 Con la finalidad que podamos tener una primera idea de nuestros datos, vamos a utilizar la función str, en primer lugar, escriba la ayuda de _?str_ y obtenga más información de esta.
 
@@ -441,92 +449,209 @@ Ahora, también podemos ver la información de nuestro data.frame como si fuera un
 ```
 View(flights)
 ```
+Ahora, vamos a crear nuestro propio data.frame a través de la función ```data.frame()```:
+```
+mydata <- data.frame(col1, col2, col3,.)
+```
+```col1, col2, col3``` son columnas con vectores de cualquier tipo (numérico, carácter, o lógico). Los nombres de las columnas se pueden declarar a través de la función _names_.
 
-Vamos a utilizar otras funciones y operaciones en R que nos permitan filtrar y hacer operaciones en los datos. A continuación, se muestra una tabla con la lista de operaciones tanto aritméticas como lógicas que se pueden realizar entre los objetos de R.
+```{R Dataframe1}
+patientID <- c(1, 2, 3, 4)
+age <- c(25, 34, 28, 52)
+diabetes <- c("Type1", "Type2", "Type1", "Type1")
+status <- c("Poor", "Improved", "Excellent", "Poor")
+patientData <- data.frame(patientID, age, diabetes, status)
+patientData
+```
+
+La forma de acceder a la información en el data.frame se puede realizar de varias maneras muy similar que las matrices.
+
+```{R Dataframe2}
+patientData[1:2] #obtenemos los elementos desde la columna 1 hasta la 2
+print("")
+patientData[c("diabetes","status")] #obtenemos los elementos a través de la etiqueta de las columnas
+print("")
+patientData$diabetes #retorna solo un vector de valores de la columna 
+
+```
+
+_$_ nos permite seleccionar directamente la columna del data.frame declarado, a continuación, se muestra un ejemplo de una _tabulación cruzada_ entre las variables status y diabetes.
+
+```{r crosstable}
+table(patientData$diabetes, patientData$status) #tabulación cruzada
+
+```
 
 
-<img src='https://github.com/urcuqui/Data-Science/blob/master/Utilities/R/operations.png?raw=true' width='250' height='250'>
+###Las funciones attach, detach y with
 
-Hagamos unas operaciones básicas, nosotros podemos utilizar R como una especie de "calculadora"" (muy parecido a la operación entre celdas en Excel). En el siguiente cuadro de código hay unas variables númericas con valores ya asignados con el fin que usted pueda realizar las siguientes operaciones:
 
-+ x + y 
-+ x * y 
-+ -x
-+ sqrt(x)
-+ x == y
-+ x != y
+La función attach() agrega el data.frame al directorio de busqueda de R. Cuando el nombre de una variable es encontrada, los data frames del directorio de busqueda son evaluados con el fin de encontrar la variable. 
 
+Vamos a utilizar el siguiente código que utilizará el dataset de mtcars y las variables que lo componen con el fin de generar un resumen de análisis descriptivo (summary) y dos plots. 
+
+
+```{r attachExample}
+summary(mtcars$mpg)
+plot(mtcars$mpg, mtcars$disp)
+plot(mtcars$mpg, mtcars$wt)
+```
+
+Este mismo resultado podemos utilizarlo a través de las funciones attach y detach. ¿Que utilidad tiene?
+
+```{r attachExample2}
+attach(mtcars)
+  summary(mpg)
+  plot(mpg, disp)
+  plot(mpg, wt)
+detach(mtcars)
+```
+Este enfoque tiene limitaciones cuando los objetos almacenados en memoria tienen el mismo nombre. 
+
+```{r attachExample3}
+mpg <- c(25, 36, 47)
+attach(mtcars)
+  plot(mpg, wt)
+detach(mtcars)
+mpg
+```
+
+Para estos casos se puede utilizar un enfoque distinto a través de la función _with()_, apliquemos esta alternativa con el ejemplo anterior. ¿Qué utilidad observa?
+
+```{r attachExample4}
+mpg <- c(25, 36, 47)
+with(mtcars, {
+  summary(mpg, disp, wt)
+  plot(mpg, disp)
+  plot(mpg, wt)
+})
+
+# El uso de los {} es opcional
+ 
+```
+
+La limitación con with es que cualquier objeto creado o asignado solo tendrá representación dentro de él. 
+
+```{r attachExample5}
+with(mtcars, {
+  stats <- summary(mpg)
+  stats
+})
+stats
+ 
+```
+Si es necesario crear o asignar a un objeto dentro de este debemos utilizar el operador <<-
+```{r attachExample6}
+with(mtcars, {
+  nokeepstats <- summary(mpg)
+  keepstats <<- summary(mpg)
+})
+keepstats
+nokeepstats
+
+ 
+```
+
+###Factor
+
+Existe un tipo de objeto conocido como Factor en donde sus valores son categóricos, específicamente, nominales u ordinales. 
+
+
+```{R factorExample1}
+diabetes <- c("Type1", "Type2", "Type1", "Type1")
+diabetesFactor <- factor(diabetes) 
+```
+
+Cree el siguiente factor y observe el orden de los niveles
+
+```{R factorExample2}
+x <- factor(c("yes", "yes", "no", "yes", "no"))
+```
+
+Para cambiar el orden de los niveles se especifica el parámetro "levels" en el orden deseado
+```{R factorExample3}
+x <- factor(c("yes", "yes", "no", "yes", "no"), levels = c("yes", "no"))
+```
 _Ejercicio 10_
 
-```{R example7}
-#Ejecute las siguientes tres líneas de código para crear las variables 
-x = c(1, 2, 4, 7, 9, 0)
-y = 4
-z = c(0.5, 2, 3, 5, 1, 0)
+Escriba y ejecute el código necesario para crear el factor ordinal ```PartientStatus(Poor, Improved, Excellent)``` y los niveles que impliquen que poor es el menor. Se recomienda utilizar la ayuda de R con el fin de definir el tipo de factor. 
 
-# Escriba en el siguiente espacio la operación suma entre "x" y "y", y asígnelo a resultado_suma (1 línea de código)
-resultado_suma <-
-# Escriba en el siguiente espacio la operación multiplicación entre "x" y "z", y asígnelo a resultado_multiplicacion (1 línea de código)
-resultado_multiplicacion <- 
-# Escriba en el siguiente espacio la operación multiplicación negativa a "z", y asígnelo a resultado_negativo (1 línea de código)
-resultado_negativo <- 
-# Escriba en el siguiente espacio la operación de raíz cuadrada "y", y asígnelo a resultado_raiz (1 línea de código)
-resultado_raiz <- 
-# Escriba en el siguiente espacio la operación lógica de igualdad entre "x" y "z", y asígnelo a resultado_igualdad (1 línea de código)
-resultado_igualdad <- 
-# Escriba en el siguiente espacio la operación lógica de diferencia entre "x" y "y", y asígnelo a resultado_igualdad (1 línea de código)
-resultado_diferencia <- 
+```{R ejercicioFactor1}
+# 1 linea de código
 
-# --------------------------- #
-  
-# Ahora ejecute las siguientes líneas de código que le permitirán observar los resultados de sus operaciones.  
-
-print("Resultado Suma")
-resultado_suma
-print("Resultado multiplicación")
-resultado_multiplicacion
-print("Resultado negativo")
-resultado_negativo
-print("Resultado raíz cuadrada")
-resultado_raiz
-print("Resultado de operación lógica: igualdad")
-resultado_igualdad
-print("Resultado de operación lógica: diferencia")
-resultado_diferencia
+# -------------------
+PatientStatus
 ```
-
-Ahora, exploremos la función _filter()_, esta función nos permite obtener un subconjunto de un observaciones de un conjunto más grande basado en los parámetros que le suministremos, vea el siguiente ejemplo. 
-
-```
-filter(flights,  carrier == "UA")
-```
-
-La anterior línea de código nos permite obtener todos los vuelos realizados por una sola aerolínea (para nuestro caso aquella abreviada con "UA").
-
-En la siguiente tabla puede observar la sintaxis para las operaciones lógicas en R.
-
-<img src='https://github.com/urcuqui/Data-Science/blob/master/Utilities/R/logical.png?raw=true' width='250' height='250'>
-
-
-Nosotros podemos realizar varias operaciones lógicas enlazadas entre sí, por ejemplo:
-
-
-```
-filter(flights,  carrier == "B6" & distance <= 1500)
-```
-
-La anterior línea de código nos da los vuelos realizados en el año 2014 y que tuvieron una distancia hasta 1500 millas.
-
-Ahora, le proponemos como ejercicio obtener el subconjunto de datos de los vuelos de la aerolinea "AA" que tuvieron una distancia entre 1300 y 1800 millas.
-
 
 _Ejercicio 11_
 
-```{R example8}
-# Escriba en el siguiente espacio el filtro que permita obtener el subconjunto de vuelos (1 línea de código)
+Si x <- c(1, 2, 3, 3, 5, 3, 2, 4, NA), ¿cuáles son los niveles de factor(x)?
+```{R ejercicioFactor2}
+# 1 linea de código
 
-# --------------------------- #
+# -------------------
+x
 ```
+
+R/
+
+_Ejercicio 12_
+
+Sea x <- c(11, 22, 47, 47, 11, 47, 11). Si ejecutamos la expresión factor(x, levels=c(11,22,47), ordered=TRUE) cuál será el cuarto elemento que se despliega en la salida?
+
+R/
+
+```{R ejercicioFactor3}
+# 2 lineas de código
+
+
+# -------------------
+```
+_Ejercicio 13_
+
+Si z <-c("p", "a" , "g", "t", "b"), cuál de las expresiones R reemplazan el tercer elemento en z con "b".
+
+a. factor(z[3]) <-"b"
+b. levels(z[3]) <-"b"
+c. z[3] <-"b"
+
+R/
+
+```{R ejercicioFactor4}
+# 2 lineas de código
+
+
+# -------------------
+z
+```
+
+### Listas
+
+Las listas son una colección ordenada de objetos que permite reunir una variedad de estos (posiblemente no relacionados) bajo un mismo nombre. Por ejemplo, podemos tener una lista que contiene una combinación de vectores, matrices, data frames, y otras listas. La forma de crear una lista es a través de la función ```list()```
+
+```mylist <- list(object1, object2, ...)```
+
+Opcionalmente, podemos darles un nombre a los objetos de la lista
+
+```mylist <- list(name1=object1, name2=object2, ...)```
+
+
+```{R listExample1}
+g <- "My first list" 
+h <- c(25, 26, 18, 39)
+j <- matrix(1:10, nrow = 5)
+k <- c("one", "two", "trhee")
+mylist <- list(title=g, ages=h, j, k) # create a list
+mylist
+
+```
+Podemos acceder a los elementos de la lista de la siguiente forma.
+```{R listExample2}
+mylist[[2]]
+mylist[[3]][1,] #retorna la matric e imprime la primera fila
+mylist[["ages"]]
+```
+
 
 ##Cargar archivos
 
@@ -556,16 +681,41 @@ read.csv2(file.choose())
 ```
 Para el siguiente ejercicio cargue el archivo "parks.csv" y asignelo a una variable "df".
 
-_Ejercicio 12_
+_Ejercicio 14_
 
-```{R example9}
+```{R example1}
 # Escriba en el siguiente espacio el código que permita cargar el archivo parks.csv (1 línea de código)
 
 # --------------------------- #
 ```
+## Ingresando datos desde el teclado 
+
+La función ```edit()``` nos permite ingresar información a través del teclado a algún objeto definido previamente.
+
+_Ejercicio 15_
+
+Ejecute el siguiente código e ingrese los elementos que completen el dataframe.
+
+```{R Inexample1}
+mydata <- data.frame(age=numeric(0), gender=character(0), weight=numeric(0))
+mydata <- edit(mydata)
+
+```
+
+## Importando desde Excel
+
+La mejor forma es importar archivos tipo CSV (Comma Separated Values) generados desde Excel. Dado el caso se requiera importar directamente desde el archivo entonces podemos utilizar las funciones del paquete xlsx
+
+```{R Inexample2}
+#install.packages("xlsx")
+library("xlsx")
+workbook <- "" # dirección del archivo
+mydataframe <- read.xlsx(workbook, 1)
+View(mydataframe)
+```
 
 
-<h2>Referencias</h2>
+##Referencias
 
 + Kabacoff, R. (2015). R IN ACTION: Data analysis and graphics with R
 + Wickham, H., & Grolemund, G. (2016). R for Data Science.
