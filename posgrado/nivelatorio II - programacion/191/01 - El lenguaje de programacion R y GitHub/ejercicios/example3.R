@@ -1,5 +1,5 @@
 # Art and code from https://github.com/aschinchon - Beautiful Curves: The Harmonograph
-pdf("../my2Output.pdf")
+pdf("my2Output.pdf")
 out <- "Binvenidos al programa de Ciencia de Datos"
 print(out)
 f1=jitter(sample(c(2,3),1));f2=jitter(sample(c(2,3),1));f3=jitter(sample(c(2,3),1));f4=jitter(sample(c(2,3),1))
