@@ -1,0 +1,260 @@
+---
+title: "Basic Statistics"
+author: "Christian Urcuqui"
+date: "21 de febrero de 2019"
+output: html_document
+---
+
+Unidades de a revisar en este notebook:
+
++ Distribución de probabilidad normal 
++ Distribución de probabilidad t-student
++ Distribución de probabilidad Chi-cuadrado
++ Intervalos de confianza
++ Pruebas de hipótesis
++ ANOVA de una vía
++ Tamaño de una muestra
+
+```{r librerias, message=FALSE}
+#install.packages("caret")
+#install.packages("Hmisc")
+#install.packages("pastecs")
+#install.packages("doBy")
+#install.packages("gmodels")
+library(caret)
+library(Hmisc)
+library(pastecs)
+library(doBy)
+library(vcd)
+library(gmodels)
+```
+
+## Distribución de probabilidad normal 
+
+
+### Estadísticos descriptivos
+
+Vamos a revisar las medidas de tendencia central, variabilidad y de distribución para _variables continuas_. Analizaremos estas medidas con el dataset de Motor Trend Road Tests (mtcars), nuestro enfoque se centrará sobre las variables que representan las millas por galón (mpg), los caballos de fuerza (hp), y peso (wt).
+
+
+```{r cars}
+vars <- c("mpg", "hp", "wt")
+head(mtcars[vars])
+```
+Existen distintas funciones que nos permiten obtener un conjunto de estadísticos descriptivos, en primer lugar, podemos encontrar en la instalación base la función summary(), veamos el ejemplo
+
+_Ejemplo 1_
+
+```{r example1}
+summary(mtcars[vars])
+```
+
+Como podemos ver en el ejemplo, la función nos permite obtener el valor mínimo, el primer cuartil, la mediana, la media, el tercer cuartil y el valor máximo por cada variable cuantitativa y las frecuencias para los factores y los vectores lógicos.
+
+Otra forma es utilizar la funciones apply() o sapply() que permite seleccionar los estadísticos descriptivos que nosotros quisiéramos utilizar.
+
+_Ejemplo 2_
+
+```{r example2}
+# definimos una función con el nombre mystats
+mystats <- function(x, na.omit=FALSE){
+  if(na.omit)
+    x <- x[!is.na(x)] # validamos los valores na con con el parámetro
+  m <- mean(x)
+  n <- length(x)
+  s <- sd(x)
+  skew <- sum((x-m)^3/s^3)/n  # sesgo
+  kurt <- sum((x-m)^4/s^4)/n - 3 # curtosis
+  ma <- max(x) # maximo
+  mi <- min(x) #minimo
+  return(c(n=n, mean=m, stdev=s, skew=skew, kurtosis=kurt, maximo = ma, minimo = mi))
+}
+sapply(mtcars[vars], mystats)
+
+# podemos obtener la moda 
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+```
+
+Para estas variables tenemos distintos estadisticos descriptivos, por ejemplo para mpg tenemos:
++ una desviación estándar de 6.0
++ una distribución con sesgo hacia la derecha (+0.61)
++ algo más plana que una distribución normal (-0.37)
+
+
+<img src="http://1.bp.blogspot.com/_mA-bypZU_yA/ScfGYolZY3I/AAAAAAAAAA4/g4__2B4EJ4c/s320/image028.gif" />
+
+
+```{r plot1}
+# veamos el plot de la distribución 
+ggplot(mtcars) +
+  geom_density(mapping = aes(x=mpg)) + 
+  geom_vline(xintercept = median(mtcars$mpg), col="red", lwd=1, lty=3) + 
+  geom_vline(xintercept = mean(mtcars$mpg), col="blue", lwd=1, lty=3) +
+  geom_vline(xintercept = getmode(mtcars$mpg), col="green",lwd=1, lty=3)
+
+```
+
+Existen un conjunto de paquetes que también permiten descrubir más estadísticos descriptivos, entre estos podemos encontrar Hmisc, pastecs, y psych. Vamos a utilizar la función describe() del paquete Hmisc retorna el número de variables y observaciones, el número de valores faltantes y únicos, la media, los cuartiles y cinco valores máximos y mínimos.
+
+```{r example3, warning=FALSE}
+describe(mtcars[vars])
+```
+El paquete pastecs incluye una función llamada stat.desc() que provee un amplio rango de estadísticos descriptivos. El formato es:
+```
+stat.desc(x, basic=TRUE, desc=TRUE, norm=FALSE, p=0.95)
+```
+Donde x es el data frame o una serie de tiempo, si basic=TRUE (por defecto) el número de valores, valores null, missing values, máximo, mínimo, rango, y la suma se proveen. Si desc=TRUE (por defecto), la mediana, la media, el error estándar de la media, el 95% del intervalo de confianza, la varianza, la desviación estándar, el coeficiente de variación son proporcionados. Finalmente, si norm=TRUE (no esta por defecto) podemos obtener los estadísticos de la distribución normal, incluyendo el sesgo y la curtosis, y el test de normalidad de Shapiro-Wilk. Como opción podemos calcular los intervalos de confianza de la media con un p-value (por defecto .95).
+
+```{r example4, warning=FALSE}
+library(pastecs)
+stat.desc(mtcars[vars], norm=TRUE)
+```
+_¡Y si esto no es suficiente!_, el paquete psych, específicamente, su función describe() nos proporciona con más cantidad de estadísticos descriptivos.
+
+```{r example5, warning=FALSE, message=FALSE}
+library(psych)
+describe(mtcars[vars])
+```
+
+## Estadísticos descriptivos por grupo
+
+Cuando se comparan grupos de individuos o observaciones, usualmente el objetivo es realizar estadisticos descriptivos por cada grupo, más que todo el conjunto de datos. Existen multiples formas de hacer esto en R. 
+
+Como primer método veamos la aplicación de la función aggregate()
+
+
+```{r example6, warning=FALSE, message=FALSE}
+aggregate(mtcars[vars], by=list(am=mtcars$am), mean)
+aggregate(mtcars[vars], by=list(am=mtcars$am), sd)
+```
+
+
+Hay que anotar aquí el uso de ```list(am=mtcars$am)```. Nosotros hubiéramos podido asociar una mayor cantidad de variables dentro del grupo ```list(name1=groupvar1, name2=groupvar2, . , groupvarN)```. Desafortunadamente, aggregate() solo nos permitirá trabajar con solo un valor de una función, por ejemplo, la media y la desviación estándar. Para esta tarea podemos utilizar la función by() con el siguiente formato.
+
+La función doBy() del paquete psych provee otro conjunto de funciones para análisis descriptivos para grupos, hay que tener en cuenta que esta recibe como parámetro una formula de la siguiente forma:
+```
+var1 + var2 + var3 + ... + varN ~ groupvar1 + groupvar2 + . + groupvarN
+```
+Donde las variables a analizar son numéricas y están a la izquierda del ~, las variables a la derecha son un grupo categórico de variables.
+
+Para el siguiente ejemplo utilizaremos un conjunto de funciones definidas previamente en mystats
+
+```{r example7, warning=FALSE, message=FALSE}
+summaryBy(mpg+hp+wt~am, data=mtcars, FUN=mystats)
+```
+La función describe.by() incluida en psych provee los mismos estadísticos que describes, estratificando una a uno los grupos de variables. 
+
+```{r example8, warning=FALSE, message=FALSE}
+describe.by(mtcars[vars], mtcars$am)
+```
+
+## Frecuencias y tablas de contingencia
+
+Vamos a ver la aplicación de frecuencias y tablas de contingencia sobre variables categoricas a través de los datos de Artritis de Kock & Edward (1988) que se encuentran en el paquete vcd. 
+
+
+```{r example9, warning=FALSE, message=FALSE}
+head(Arthritis)
+str(Arthritis)
+```
+¿Cuáles son las variables categóricas?
+
+Existen multiples formas para crear una table de frecuencias, por ejemplo:
+
+| __Función__ | __Descripción__ | 
+|----------------|-----------------------------------------------------------------------|
+| ```table(var1, var2, ., varN)```  | Crea una tabla de contingencia de n variables  | 
+| ```xtabs(formula, data)```  | Crea una tabla de contingencia basada en la formula y el data frame | 
+| ```prop.table(table, margins)```  | Expresa una tabla como fracciones definidos en margins  | 
+| ```margin.table(table, margins)```  | Suma todos los valores de la tabbla marginal definida en margins |
+| ```addmargins(table, margins)**``` | Resumen de margins  | 
+| ```ftable(table)``` | Crea una tabla de contingencia "plana" | 
+
+Podemos crear una tabla de frecuencias usando la función table()
+
+
+```{r example10, warning=FALSE, message=FALSE}
+table(Arthritis$Improved)
+```
+
+Podemos entonces tomar estas frecuencias y representarlas en proporciones.
+```{r example11, warning=FALSE, message=FALSE}
+prop.table(table(Arthritis$Improved))
+prop.table(table(Arthritis$Improved))*100 # en porcentajes
+```
+
+Para table(), La tablas de dos vía se representan con el siguiente formato 
+```
+mytable <- table(A, B)
+```
+
+Donde A es la variable fila y B es la variable columna, veamos la aplicación.
+
+```{r example12, warning=FALSE, message=FALSE}
+xtabs(~ Improved + Sex, data=Arthritis)
+```
+
+Podemos desglosar más los datos con la función CrossTable del paquete gmodels
+
+```{r example13, warning=FALSE, message=FALSE}
+CrossTable(Arthritis$Treatment, Arthritis$Improved)
+```
+
+
+## Pruebas de independencia 
+
+Chi cuadrado
+
+```{r example14, warning=FALSE, message=FALSE}
+library(vcd)
+mytable <- xtabs(~Treatment+Improved, data=Arthritis)
+chisq.test(mytable)
+```
+
+Test de COCHRAN-MANTEL-HAENSZEL
+
+```{r example15, warning=FALSE, message=FALSE}
+mytable <- xtabs(~Treatment+Improved+Sex, data=Arthritis)
+mantelhaen.test(mytable)
+```
+
+Medidas de asociación para tablas de dos vías
+
+```{r example16, warning=FALSE, message=FALSE}
+library(vcd)
+mytable <- xtabs(~Treatment+Improved, data=Arthritis)
+assocstats(mytable)
+```
+
+## Correlaciones 
+
+Correlaciones PEARSON, SPEARMAN, y KENDALL 
+
+```
+cor(x, use= , method= )
+```
+
+use especifica el tratamiento de missing values
+
+```{r example17, warning=FALSE, message=FALSE}
+states<- state.x77[,1:6]
+cov(states)
+```
+
+Correlaciones
+
+```{r example18, warning=FALSE, message=FALSE}
+cor(states)
+```
+```{r example19, warning=FALSE, message=FALSE}
+cor(states, method="spearman")
+```
+
+
+## Referencias
+
++ 
