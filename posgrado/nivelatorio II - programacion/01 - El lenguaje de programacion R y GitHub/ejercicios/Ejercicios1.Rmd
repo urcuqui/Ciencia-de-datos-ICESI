@@ -72,7 +72,7 @@ Cree una función que permita imprimir los números impares de un vector de núm
 
 ## Ejercicio 7
 
-Cree un array de dimensiones 3x3x2 que tenga un vector integrado por los siguientes vectores
+Cree un array de 3x3x2 que tenga los valores de un vector integrado por los siguientes objetos|
 |
 ```
 vector1 <- c(5,9,3)
@@ -149,7 +149,7 @@ embarked:
 ```
 ## Ejercicio 2
 
-Cargue el paquete dplyr (si es necesario intalelo)
+Cargue el paquete dplyr (si es necesario instalelo)
 
 ```{r lib, message=FALSE}
 ```
