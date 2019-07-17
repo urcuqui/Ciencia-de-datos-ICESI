@@ -89,11 +89,6 @@ vector2 <- c(10,11,12,13,14,15)
 Cargue en un objeto dataframe el archivo csv que se encuentra en el siguiente enlace:
 
 ```
-https://raw.githubusercontent.com/urcuqui/Ciencia-de-datos-ICESI/master/posgrado/datasets/titanic/train_titanic.csv
-
-```
-
-```
 https://web.stanford.edu/class/archive/cs/cs109/cs109.1166/stuff/titanic.csv
 
 ```
@@ -134,7 +129,7 @@ valores pueden ser contados pero no medidos.
   
 ## Ejercicio 1
 
-Clasifique cada una de las variables según su tipo:
+Clasifique las variables según su tipo (solo los datos del dataset que cargo):
 ```
 Survival:
 pclass:
@@ -190,5 +185,20 @@ A partir de los datos responda la siguiente pregunta, ¿cuál es la probabilidad
 **Ayuda: tabulación cruzada**
 
 ```{r uni5_2}
+
+```
+
+
+## Reto (adicional)
+
+Cargue el dataset de este enlace y realice el proceso necesario para eliminar los registros NA de cada una de las variables 
+
+
+```
+https://raw.githubusercontent.com/urcuqui/Ciencia-de-datos-ICESI/master/posgrado/datasets/titanic/train_titanic.csv
+```
+
+
+```{r limpieza}
 
 ```
