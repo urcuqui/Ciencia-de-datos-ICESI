@@ -1,0 +1,70 @@
+---
+title: Reto Level 1 - Titanic
+author: Christian Urcuqui
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    theme: yeti
+---
+
+# Reto de aprendizaje
+
+En el presente notebook se propone un taller que tiene como objetivo poner a prueba los conocimientos acerca de R para la resolución de preguntas de analítica de datos a partir un conjunto de datos que hace parte de un reto propuesto por la plataforma web Kaggle.
+
+**Competencias del estudiante:**
+
++ El lenguaje de programacion R y GitHub.
+  + Aplicar los conceptos basicos de codificacion en R.
+  + Explorar un data.frame en R.
+  + Desarrollar plots básicos en R.
+  + Manipular fechas y valores faltantes en R.
+  + Aplicar funciones de R para la manipulación de datasets.
+
+# Descripción Titanic {.tabset .tabset-pills}
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/St%C3%B6wer_Titanic.jpg/300px-St%C3%B6wer_Titanic.jpg" >
+
+En el siguiente enlace puede descargar el dataset de Titanic
+
+```
+https://raw.githubusercontent.com/urcuqui/Ciencia-de-datos-ICESI/master/posgrado/datasets/titanic/train_titanic.csv
+```
+
+|Variable| Definition | Key
+|:-:|:-:|:-:|---|---|
+| Survival  | Survival | 0 = No, 1 = Yes  |   |   |
+| pclass  |  	Ticket class |  1 = 1st, 2 = 2nd, 3 = 3rd |   |   |
+| sex  |  Sex | 	Age in years  |   |   |
+| Age  | Age in years	  |   |   |   |
+| sibsp  | # of siblings / spouses aboard the Titanic	  |   |   |   |
+| parch  | # of parents / children aboard the Titanic |   |   |   |
+| ticket  | Ticket number  |   |   |   |
+| fare  | Passenger fare  |   |   |   |
+| cabin  | Cabin number  |   |   |   |
+| embarked  | Port of Embarkation  |  C = Cherbourg, Q = Queenstown, S = Southampton |   |   |
+
+Se le pide un reporte en HTML donde se permita conocer el proceso y la aplicación de la exploración de datos y la respuesta a las siguientes preguntas:
+
+## Complejidad 1
+
++ Explore el dataset e identifique las variables que presentan datos faltantes
++ Transforme las variables a los siguientes tipos (solo si es necesario):
+  + Name -> Character
+  + Ticket -> Character
+  + Cabin -> Factor
+  + Embarked -> Factor
++ Elimine los registros con datos faltantes
++ (ggplot) utilice un diagrama que permita conocer cual es el número de registros (valores) más grande para la variable Survived (0,1) 
++ ¿Quien sobrevivió más, mujeres o hombres? 
+
+## Complejidad 2
+
++ (ggplot) ¿Existe algo particular entre la edad de las personas y la variable Survived?
++ ¿Las familias númerosas sobreviven más?
++ ¿Cuál fue el título de las personas que más y menos sobrevivieron en el titanic? **ayuda: con strsplit y un recorrido podras tener el título en el nombre de cada persona** 
++ Para este conjunto de datos, ¿qué tan cierto es que "Las mujeres y los niños primero..."?
+
+<img src="http://1.bp.blogspot.com/-dnWicBtHHcE/U0b1oCR7m3I/AAAAAAAAAWs/UW7UlFffR4E/s1600/hundimiento.jpg" >
