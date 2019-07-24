@@ -80,7 +80,7 @@ mydata <- transform(mydata,
 
 En algunas ocasiones será necesario crear nuevos valores de una variable condicional a los valores existentes de las mismas u otras variables, por ejemplo:
 
-+ cambiar una variable continua por un conjunto de categorías
++ Cambiar una variable continua por un conjunto de categorías
 + Reemplazar valores mal codificados en valores correctos
 + Crear o completar unos valores teniendo en cuenta unas reglas
 
@@ -119,8 +119,7 @@ __Ejemplo 3__
 
 ```{r example3}
 leadership$agecat[leadership$age > 75] <- "Elder"
-leadership$agecat[leadership$age >= 55 &
-leadership$age <= 75] <- "Middle Aged"
+leadership$agecat[leadership$age >= 55 & leadership$age <= 75] <- "Middle Aged"
 leadership$agecat[leadership$age < 55] <- "Young"
 ```
 
@@ -434,7 +433,7 @@ names(newdata)
 
 ### Selección de registros
 
-La selección o la exclusión de observaciones es actividad típica y clave para un análisis éxito en los datos, observemos algunos ejemplos
+La selección o la exclusión de observaciones es actividad típica y clave para un análisis éxitoso en los datos, observemos algunos ejemplos
 
 __Ejemplo 21__
 
@@ -534,7 +533,7 @@ localuserpassword <- "SomethingDifficult"
 storiesDb <- dbConnect(MySQL(), user='username', password=localuserpassword, dbname='sakila', host='localhost')
 # La siguiente linea despliega las tablas de la base de datos cargada
 dbListTables(storiesDb)
-# Vamos ahora a pasar la base de datos cargada a un data.frame,< el parámetro name define el nombre de la tabla a procesar
+# Vamos ahora a pasar la base de datos cargada a un data.frame, el parámetro name define el nombre de la tabla a procesar
 actor_df <- dbReadTable(conn = storiesDb, name = 'actor')
 head(actor_df)
 # dbDisconnect es el método que nos permite terminar la conexión con la base de datos

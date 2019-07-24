@@ -81,7 +81,7 @@ R/
 
 
 ```
-Tenga cuidado al utilizar operaciones lógicas de igualdad en R. En muchas ocasiones se utiliza = en vez de ==, es usual que este inconveniente suceda por lo tanto R le notificara con un mensaje de error
+Tenga cuidado al utilizar operaciones lógicas de igualdad en R. En muchas ocasiones se utiliza = en vez de ==, es usual que este inconveniente suceda por lo tanto R les notificara con un mensaje de error
 
 _Ejemplo 2_
 
@@ -89,7 +89,7 @@ _Ejemplo 2_
 filter(flights, month = 1)
 ```
 
-Las computadoras utilizan aritmética de operación finita, es decir, no se almacenan números con infinitos números de dígitos, por lo tanto, recuerde que cada número es una aproximación. En vez de usar ==, utilice la función near() que permite comparar dos vectores con números decimales: 
+Las computadoras utilizan aritmética de operación finita, es decir, no se almacenan números con infinitos dígitos, por lo tanto, recuerde que cada número es una aproximación. En vez de usar ==, utilice la función near() que permite comparar dos vectores con números decimales: 
 
 _Ejemplo 3_
 
@@ -117,7 +117,7 @@ nov_dec <- filter(flights, month %in% c(11, 12))
 
 ## Valores faltantes
 
-Una caracteristica importante de R que se puede generar molestias en una comparación son los valores faltantes (missing value) o NAs (Not Availables).
+Una caracteristica importante de R que puede generar molestias en una comparación son los valores faltantes (missing value) o NAs (Not Availables).
 
 _Ejemplo 5_
 
