@@ -1,0 +1,673 @@
+---
+title: "Dplyr and Time Series"
+author: "Christian Urcuqui"
+date: "26 de febrero de 2019"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+<img src="https://www.icesi.edu.co/servicios/wp-content/uploads/2017/05/logo_icesi-1024x321.png" width="250" />
+
+# Tratamiento de datos relacionales con dplyr
+
+Las relaciones siempre están definidas como un par de tablas, todas relacionadas a través de una o más variables. Entre algunas operaciones para datos relacionales podemos encontrar:
+
++ Uniones, una o más variables son asignadas a un nuevo data frame desde las observaciones de otro
++ filtros, se filtran observaciones de un data frame a través de una operación lógica 
++ conjunto de operaciones, tratamiento de observaciones basado en una operación 
++ Reordenar las filas 
++ Crear nuevas variables a partir de un conjunto de funciones y variables
++ Seleccionar variables a través de sus nombres
++ Resumir los valores de un conjunto de variables
+
+Es común utilizar datos relacionados en un sistema de base de datos relacional (RDBMS), un ejemplo de estos sistemas es el que está bajo la tecnología de SQL de ORACLE. Para R podemos encontrar el paquete dplyr que nos facilita un conjunto de funciones (operaciones) sobre datos relaciones.
+
+
+
+```{r librerias, message=FALSE}
+#install.packages("tidyverse")
+#install.packages("nycflights13")
+#install.packages("xts")
+#install.packages("PerformanceAnalytics")
+library(tidyverse)
+library(nycflights13)
+library(xts)
+library(PerformanceAnalytics)
+```
+
+Veamos las operaciones básicas que el paquete dplyr nos brinda en el dataset de vuelos
+
+### Filtro de filas con filter()
+
+filter() nos permite obtener un subconjunto de observaciones basado en el parametro que le ingresemos. 
+
+```
+filter(Data.frame, operaciones lógicas)
+```
+
+_Ejemplo 1_
+
+Uso de filter() para obtener los vuelos realizados entre las aerolineas terminadas en HA o B6 
+```{r example1, message=FALSE}
+filter(nycflights13::flights, carrier=="HA" | carrier=="B6")
+```
+
+_Ejercicio 1_
+
+Obtenga los datos de los vuelos con el valor más grande en la distancia recorrida entre aeropuertos.
+
+__Recordatorio: existen funciones del paquete base que les permiten calcular el valor mínimo  y máximo de un vector__
+
+```{r ejercicio1}
+#1 linea de código
+filter(nycflights13::flights, max(distance)==distance)
+# -----------------------
+```
+
+_Ejercicio 2_
+
+¿Es siempre el mismo vuelo? ¿cuáles son los orígenes y destinos?
+
+__Recomendación: vean el significado de los códigos contra el dataset airports {nycflights13}__
+
+R/
+
+```{r ejercicio2, message=FALSE, warning=FALSE, error=TRUE}
+
+summary(filter(nycflights13::flights, max(distance)==distance)$dest)
+class(filter(nycflights13::flights, max(distance)==distance))
+summary(factor(filter(nycflights13::flights, max(distance)==distance)$dest))
+destino <- factor(filter(nycflights13::flights, max(distance)==distance)$dest)
+summary(factor(filter(nycflights13::flights, max(distance)==distance)$origin))
+origen <- factor(filter(nycflights13::flights, max(distance)==distance)$origin)
+filter(nycflights13::airports,faa == as.character(origen) | faa == as.character(destino))
+
+```
+Tenga cuidado al utilizar operaciones lógicas de igualdad en R. En muchas ocasiones se utiliza = en vez de ==, es usual que este inconveniente suceda por lo tanto R le notificara con un mensaje de error
+
+_Ejemplo 2_
+
+```{r ejemplo2, error=TRUE}
+filter(flights, month = 1)
+```
+
+Las computadoras utilizan aritmética de operación finita, es decir, no se almacenan números con infinitos números de dígitos, por lo tanto, recuerde que cada número es una aproximación. En vez de usar ==, utilice la función near() que permite comparar dos vectores con números decimales: 
+
+_Ejemplo 3_
+
+```{r ejemplo3}
+sqrt(2) ^ 2 == 2
+near(sqrt(2) ^ 2, 2)
+
+```
+
+## Operaciones lógicas
+
+Como hemos visto, los filtros pueden tener operaciones lógicas enlazadas, recordemos algunas de estas con su respectiva representación en R.
+
+
+<img src="https://d33wubrfki0l68.cloudfront.net/01f4b6d39d2be8269740a3ad7946faa79f7243cf/8369a/diagrams/transform-logical.png" width="450" />
+
+Vamos ahora a filtrar los vuelos realizados entre el mes de noviembre o diciembre a través de una forma más eficiente ya que permite realizar búsquedas  mucho más especificas
+
+_Ejemplo 4_
+
+```{r ejemplo4}
+nov_dec <- filter(flights, month %in% c(11, 12))
+```
+
+
+## Valores faltantes
+
+Una caracteristica importante de R que se puede generar molestias en una comparación son los valores faltantes (missing value) o NAs (Not Availables).
+
+_Ejemplo 5_
+
+Observe los resultados de las operaciones que se realizan contra NA
+
+```{r ejemplo5}
+NA > 5
+10 == NA
+NA + 10
+NA / 2
+NA == NA
+```
+Si queremos determinar si un valor es NA podemos utilizar la función is.na()
+
+_Ejemplo 6_
+```{r ejemplo6}
+x <- NA
+is.na(x)
+```
+
+_Ejercicio 3_
+
+Utilice la función filter() y obtenga los valores que no son NA
+
+```{r ejercicio3}
+x <- data.frame(c(seq(1,5), NA, seq(1,5), NA))
+# 1 linea de código
+filter(x, !is.na(x))
+# -----------
+```
+Recuerde que esta misma operación la puede realizar a través del filtro sobre el mismo data frame
+
+```
+x[!is.na(x)]
+```
+_Ejercicio 4_
+
+Encuentre todos los vuelos que llegaron dos o más horas tarde.
+
+```{r ejercicio4}
+
+# 1 linea de código
+filter(flights, hour>=2)
+# -----------
+```
+
+_Ejercicio 5_
+
+Encuentre todos los vuelos que operaron con United, American, o Delta
+__Recomendación: revise la función grepl__
+
+```{r ejercicio5}
+filter(flights, carrier == filter(airlines, grepl("American", airlines$name))$carrier | carrier ==  filter(airlines, grepl("United", airlines$name))$carrier | carrier == filter(airlines, grepl("Delta", airlines$name))$carrier)
+# -----------
+```
+
+
+## Organización con la función arrange()
+
+La función arange() funciona de forma similar que filter() pero con la diferencia que en vez de seleccionar filas, este procederá a cambiar su orden. 
+
+La función recibe un data frame y un conjunto de nombre de variables con el objetivo de ordenarlas.
+
+_Ejemplo 7_
+
+En la siguiente línea de código procederemos a ordenar el data frame flights teniendo en cuenta las variables año, mes y día. 
+```{r ejemplo7}
+arrange(flights, year, month, day)
+```
+
+_Ejemplo 8_
+
+Si queremos aplicar un ordenamiento descendiente a partir de una variable, podemos utilizar la función desc()
+
+```{r ejemplo8}
+arrange(flights, desc(arr_delay))
+```
+
+_Ejemplo 9_
+
+Los missing values son siempre organizados al final de los registros.
+
+
+```{r ejemplo9}
+# la función tibble nos permite crear un data frame
+df <- tibble(x = c(5,NA,3))
+arrange(df, x)
+```
+
+_Ejercicio 6_
+
+¿Puede utilizar arrange() y organizar los elementos con el fin que los missing values estén al inicio de los registros?
+
+```{r ejercicio6}
+df <- tibble(x = c(5,3,NA))
+# 1 linea de código
+arrange(df, !is.na(x))
+# --------------
+```
+
+_Ejercicio 7_
+
+Organice los vuelos con el fin de encontrar el origen y destino de los 5 más retrasados
+
+```{r ejercicio7}
+# 1 linea de código
+arrange(flights, desc(arr_delay))[1:5,c('origin','dest')]
+# --------------
+```
+
+
+## Selección de variables con select()
+
+La función select() nos permite obtener subconjuntos de un data frame a partir de la aplicación de operaciones que incluyen nombres de variables.
+
+
+_Ejemplos 10, 11 y 12_
+
+Selección de variables por nombre
+```{r ejemplo10}
+select(flights, year, month, day)
+```
+
+Selección de todas las variables entre year y day
+
+```{r ejemplo11}
+select(flights, year:day)
+```
+
+Seleccionamos todas las variables con excepción de las variables entre year y day
+
+```{r ejemplo12}
+select(flights, -c(year:day))
+```
+
+Existen otro conjunto de funciones que pueden ser de ayuda con la función select(), cuatro de estas son:
+
++ starts_with("abc") retorna los nombres que comienzan con "abc".
++ ends_with("xyz") retorna los nombres que finalizan con "xyz".
++ contains("ijk") retorna los nombres que contienen los caracteres "ijk".
++ matches("(.)\\1") selecciona las variables que se encuentran representadas por la expresión regular, en este caso las palabras con caracteres repetidos
+
+_Ejemplo 13 y 14_
+
+Podemos utilizar la función rename() que es un derivado de select() con la finalidad de cambiar los nombres de las variables.
+
+```{r ejemplo13}
+colnames(flights)
+print("----")
+colnames(rename(flights, tail_num = tailnum))
+```
+
+En la ayuda de la función select() podemos encontrar que se puede utilizar en conjunto con everything() con la finalidad mostrar todas las variables, pero, en el siguiente ejemplo veremos que es posible aplicar este proceso con el fin de ordenar las variables, es decir, para este caso aparecerán time_hour y air_time al inicio y luego las variables restantes
+
+```{r ejemplo14}
+select(flights, time_hour, air_time, everything())
+```
+
+## Adicionando variables con la función mutate()
+
+
+La función mutate() nos permite adicionar nuevas variables al final de nuestro data frame, veamos como creamos un conjunto de variables a partir de la operación de la selección de otras. 
+
+_Ejemplo 15_
+
+```{r ejemplo15}
+flights_sml <- select(flights,
+year:day,
+ends_with("delay"), # obtenemos las columnas que terminan con delay
+distance,
+air_time
+)
+# luego operamos sobre las variables del subconjunto de datos y agregamos dos columnas (gain y speed)
+mutate(flights_sml,
+gain = arr_delay - dep_delay,
+speed = distance / air_time * 60
+)
+```
+La anterior operación es muy usual en la analítica de datos, específicamente, en minería de datos
+
+_Ejemplo 16_
+
+Si solo deseamos obtener las variables creadas y no enlazarlas al data frame podemos utilizar la función transmutate()
+
+```{r ejemplo16}
+transmute(flights,
+gain = arr_delay - dep_delay,
+hours = air_time / 60,
+gain_per_hour = gain / hours
+)
+```
+
+## Otras funciones para creación de variables 
+
+Existen otro conjunto de funciones que podemos utilizar en conjunto con mutate(), algunas de estas son:
+
++ Operaciones aritméticas +, -, *, /, ^
+
+Una operación se aplicará a todos los valores de los vectores sometidos 
+
++ Operaciones aritméticas modulares (%/% y %%)
+
+%/% para una división de enteros y %% para obtener el residuo de una división, es muy útil cuando queremos partir un entero en pedazos 
+```{r ejemplo17}
+transmute(flights,
+dep_time,
+hour = dep_time %/% 100,
+minute = dep_time %% 100
+)[1:3,]
+```
++ Logs log(), log2(), log10()
+
+Los logartimos son ampliamente utilizados para trabajar con datos que abarcan múltiples órdenes de magnitud.
+
++ Acumulativos 
+
+dplyr trae consigo un conjunto de funciones que permiten calcular datos acumulativos, por ejemplo, la función cummean() nos permite calcular la media acumulativa y cumsum() la suma acumulativa 
+
+```{r ejemplo18}
+x <- 1:10
+cumsum(x)
+cummean(x)
+```
+
+## Resumenes con la función summarize()
+
+La función summarize() permite crear colapsar los datos de un data frame a solo una fila 
+
+_Ejemplo 19_
+
+En el siguiente ejemplo calcularemos la media indicando que los missing values se tendrán en cuenta
+
+```{r ejemplo19}
+summarize(flights, delay = mean(dep_delay, na.rm = TRUE))
+```
+
+La función summarize() se puede sacar más provecho si se utiliza en conjunto con la función group_by(), es decir, podríamos aplicar su resultado a un grupo de datos de manera individual.
+
+_Ejemplo 20_
+
+Veamos la aplicación de ambas funciones. En este ejemplo agruparemos el dataset a partir de las variables year, month y day, luego, procederemos a asociar la media de los retrasos de las salidas
+
+```{r ejemplo20}
+by_day <- group_by(flights, year, month, day)
+summarize(by_day, delay = mean(dep_delay, na.rm = TRUE))
+class(by_day)
+str(flights)
+```
+
+## Combinando múltiples operaciones con Pipe
+
+Suponga que deseamos explorar la relación entre la distancia y el promedio de retrasos de cada localización. A través de las anteriores secciones podríamos desarrollar la solución con el siguiente código
+```{r ejemplo21}
+# agrupemos los vuelos por localización
+by_dest <- group_by(flights, dest)
+# apliquemos summarize y obtengamos las variables de análisis
+delay <- summarize(by_dest, count = n(), dist = mean(distance, na.rm = TRUE), delay = mean(arr_delay, na.rm = TRUE))
+# filtremos aquellas que sean mayores a 20 y que sean distintas a HNL
+delay <- filter(delay, count > 20, dest != "HNL")
+delay
+```
+¿Que se sucede si generamos un plot de estos datos y observamos la relación de algunas variables?
+
+```{r ejemplo22}
+ggplot(data = delay, mapping = aes(x = dist, y = delay)) +
+  geom_point(aes(size = count), alpha = 1/3) +
+  geom_smooth(se = FALSE)
+```
+Del anterior insumo podríamos presumir que los retrasos aumentan con una distancia de hasta ~ 750 millas y luego disminuyen. ¿Quizás a medida que los vuelos se hacen más largos hay más capacidad para compensar retrasos en el aire?
+
+Podríamos también generar el mismo resultado sin necesidad de tantos pasos, esto podríamos llevarlo a cabo con pipe, %>%
+
+```{r ejemplo23}
+delays <- flights %>%
+  group_by(dest) %>%
+  summarize(count = n(), 
+            dist = mean(distance, na.rm = TRUE), 
+            delay = mean(arr_delay, na.rm = TRUE)) %>%
+  filter(count > 20, dest!="HNL")
+```
+
+Hay que tener mucho cuidado con los missing values y la aplicación de pipe, observe que hemos usado el parámetro na.rm que permite validar este tipo de dato
+```{r ejemplo24}
+summary(flights)
+flights %>%
+group_by(year, month, day) %>%
+summarize(mean = mean(dep_delay))
+```
+
+# Manipulación de series de tiempo con XTS y ZOO
+
+xTS (eXtensible Time Series) es un paquete que nos permite manipular datos que se encuentran registrados con base en el tiempo. 
+
+En el siguiente ejemplo crearemos una matriz con datos, un vector de fechas, luego crearemos un objeto xts que nos permitirá asociar cada registro contra los valores de las fechas.
+
+```{r ejemplo25}
+x <- matrix(1:4, ncol=2, nrow=2)
+x
+idx <- as.Date(c("2015-01-01", "2015-02-01"))
+idx
+X <- xts(x, order.by = idx)
+X
+```
+
+Podríamos ver el anterior resultado como las fechas son los índices que representan a los valores de cada variable de la matriz
+```
+xts = matrix + index 
+```
+El constructor de xts se encuentra conformado por los siguientes parámetros
+```
+xts(x = NULL,
+ order.by = index(x),
+ frequency = NULL,
+ unique = NULL,
+ tzone = Sys.getenv("TZ"))
+```
++ tzone especifica la zona horaria de la serie de tiempo
++ unique fuerza a los tiempos a ser únicos 
++ index es en orden ascendente en el tiempo
+
+Con el fin de analizar los datos de un objeto xts podemos utilizar la función coredata() y la función index() para obtener los indices de la serie de tiempo
+
+```{r ejemplo26}
+coredata(x, fmt=FALSE)
+index(x)
+```
+
+Vamos a cargar un conjunto de datos sobre las manchas solares desde el año 1749 hasta 1983 que se encuentran en formato ts (time series)
+```{r ejemplo27}
+data(sunspots)
+class(sunspots)
+```
+Convirtamos los datos a xts y exploremoslos
+
+```{r ejemplo28}
+sunspots_xts <- as.xts(sunspots)
+head(sunspots_xts)
+```
+Tambíen podemos inportar los datos de otras fuentes de información, por ejemplo utilizando las funciones read.table() y read.csv, lo anterior con el fin que puedan ser luego convertidos a xts.
+```
+as.xtx(read.table("file"))
+as.xtx(read.csv("file"))
+```
+Según la ISO 8601:2044 la presentación estándar de la fecha y tiempo va de izquierda a derecha desde el más significativo hasta el dígito menos significativo.
+
+```
+YYYY-MM-DDTHH:MM:SS 
+```
+Es importante tener en cuenta este estándar ya que xts lo soporta 
+
+Veamos las siguientes representaciones en formatos para xts y la forma que nos facilita este paquete para hacer filtros
+```{r ejemplo29}
+data(edhec, package = "PerformanceAnalytics") 
+head(edhec)
+# observe que podemos realizar el filtro de la siguientes formas
+print(" --------")
+head(edhec["2007-01", 1])
+print(" --------")
+head(edhec["2007-01/2007-03",1])
+print("")
+head(edhec["200701/03", 1]) # similar a la anterior busqueda, obtenemos los datos desde el mes 01 hasta 03 de la primera variable ( Convertible Arbitrage)
+
+```
+## Técnicas alternativas para extracción
+
+Indexación con enteros ```x[c(1, 2, 3)]```
+```{r ejemplo30}
+edhec[c(1, 2, 3), ]
+```
+
+Vectores lógicos ```x[index(x)> "2016-08-20"]``
+
+```{r ejemplo31}
+edhec[index(edhec)> "2008-12-31"]
+```
+
+Objetos Date (Date, POSIXct, etc.)
+
+```{r ejemplo32}
+dates <- as.POSIXct(c("2003-03-31", "2005-04-30"))
+edhec[index(edhec)==dates]
+```
+
+## Métodos para encontrar periodos en nuestros datos
+
+R implementa como funciones head() y tail() con el fin de ver los datos de inicio y final de una serie. Para nuestro caso contamos con dos funciones similares (first() y last()) en xts para el tratamiento de tiempo.
+
+```{r ejemplo33}
+first(edhec[, "Funds of Funds"])
+print(" -------- ")
+first(edhec[, "Funds of Funds"], "4 months")
+print(" -------- ")
+first(edhec[, "Funds of Funds"], "2 days")
+print(" -------- ")
+last(edhec[, "Funds of Funds"], "1 year")
+# también podemos encontrar periodos con enteros 
+print(" -------- ")
+first(edhec, n=2, keep= FALSE)
+```
+
+Podemos también combinar ambas funciones para realizar filtros más exhaustivos  
+```{r ejemplo34}
+first(last(edhec[, "Merger Arbitrage"], "2 years"), "5 months")
+```
+
+## Operaciones entre objetos xts
+
+Como hemos mencionado xts es una matrix y es por ello que sus elementos pueden ser tratados, en el caso de fechas las operaciones matemáticas son intersecciones de tiempos
+
+Vamos a realizar las siguientes operaciones entre objetos xts con el fin que pueda observar sus resultados. 
+
+```{r ejemplo35}
+x <- c(rep(1, 3))
+y <- c(rep(2, 3))
+idx <- as.Date(c("2016-08-09", "2016-08-10", "2016-08-11"))
+idy <- as.Date(c("2016-08-09", "2016-08-10", "2016-08-12"))
+X <- xts(x, order.by = idx)
+Y <- xts(y, order.by = idy)
+X
+Y
+X + Y # intersección de fechas
+
+print(" ------- ")
+# si deseamos obtener todos los registros 
+x_union <- merge(X, index(Y), fill=0)
+y_union <- merge(Y, index(X), fill = 0)
+x_union + y_union
+```
+
+## Fusionando series de tiempo
+
+Podemos combinar series por columna a través de las funciones cbind() y merge(), entre estas combinaciones podemos encontrar de derecha, izquierda, interiores y exteriores.
+
+```{r ejemplo36}
+X
+print(" -------- ")
+Y
+print(" -------- ")
+merge(X, Y) # Join por defecto "outer"
+print(" -------- ")
+merge(X, Y, join = "inner")
+print(" -------- ")
+merge(X, Y, join = "right", fill = na.locf) # se autocompleta el NA 
+print(" -------- ")
+merge(X, 3)
+print(" -------- ")
+merge(X, as.Date(c("2016-08-14")))
+```
+
+También podemos hacer las inserciones por filas a través de la función rbind(). Hay que anotar que todas las filas deben tener un orden de tiempo y el número de variables debe coincidir.
+
+```{r ejemplo37}
+rbind(X, Y)
+```
+Note que se pueden repetir filas con los registros.
+
+## Gestionando missing values en series de tiempo
+
+Podemos realizar un relleno de missing values con la última observación a través de la función locf (last observation carried forward)
+
+```{r ejemplo40}
+object <- merge(X, Y)
+na.locf(object, 
+       fromLast = FALSE,
+       maxgap = Inf)
+```
+Reemplazar missing values
+
+```{r ejemplo41}
+na.fill(object, 5)
+```
+Remover missing values 
+```{r ejemplo42}
+na.trim(object)
+na.omit(object)
+```
+Interpolación 
+```
+na.approx(object, ...)
+```
+# Taller
+
+<img src="https://fxmedia.s3.amazonaws.com/articles/best-automated-forex-1.jpg" width="250" />
+
+Aplique los conceptos vistos en el dataset del portafolio 
+https://www.dropbox.com/s/fd1064pxz1ss72g/datos.RData?dl=0
+
+```{r taller1}
+# vamos a cargar el archivo RData
+load(file.choose())
+```
+```{r taller2}
+# vamos a prepocesar los dato, por favor ejecute las siguientes lineas de código
+datos.provicionales <- t(datos) # se crea una base de datos provicional para generar el data frame donde las filas sean las fechas y las columnas las acciones deseadas
+names <- t(datos[1])
+datos.provicionales <- as.data.frame(datos.provicionales)
+datos.provicionales <- datos.provicionales[-1,]
+names(datos.provicionales)<-names
+PORTAFOLIO <- datos.provicionales[c("GRUPOSURA", "ECOPETROL", "NUTRESA", "EXITO", "ISA", "GRUPOAVAL", "PFAVH", "CONCONCRET", "VALOREM", "OCCIDENTE")]
+
+names <-c ("GRUPOSURA", "ECOPETROL", "NUTRESA", "EXITO", "ISA", "GRUPOAVAL", "AVIANCA", "CONCONCRETO", "VALOREM", "OCCIDENTE")
+
+names(PORTAFOLIO) <- names
+
+# se tiene que cambiar la clase de los columnas del data.frame PORTAFOLIO
+indx <- sapply(PORTAFOLIO, is.factor)
+PORTAFOLIO[indx] <- lapply(PORTAFOLIO[indx], function(x) as.numeric(as.character(x)))
+dates <- as.Date(row.names(PORTAFOLIO))
+#se crea un objeto  xts
+PORTAFOLIO2 <- xts(x=PORTAFOLIO, order.by=dates)
+
+no.Acciones <- matrix(c(156, 2000, 378, 998, 1983, 92468, 922, 1367, 651, 7943), 10, 1)
+
+resumen        <- as.data.frame(cbind(names, no.Acciones, t(tail(PORTAFOLIO2, 1)), no.Acciones * t(tail(PORTAFOLIO2, 1))))
+resumen[,2] <- as.numeric(as.character(resumen[,2] ))
+resumen[,3] <- as.numeric(as.character(resumen[,3] ))
+resumen[,4] <- as.numeric(as.character(resumen[,4] ))
+resumen[,5] <- resumen[,4]/sum(resumen[,4]) *100
+names(resumen) <-  c("Nombre", "No. de Acciones", "Precio", "P*Q", "Part. %")
+prices_daily <- PORTAFOLIO2 # crea serie diario
+asset_returns_diario <- Return.calculate(prices_daily, method = "log")*100 # calcula los rendimientos 
+
+resumen.diario     <- as.data.frame(cbind(t(tail(asset_returns_diario, 3))))
+
+```
+Vamos a crear un plot con el fin que pueda inferir visualmente algunas cosas de los datos con el fin que pueda resolverlas en las siguientes clases.
+
+```{r taller3}
+#ggplot(data = PORTAFOLIO, aes(x = rownames(PORTAFOLIO), y = ECOPETROL))+
+#  geom_line(color = "#00AFBB", size = 2)
+
+autoplot(PORTAFOLIO2[, "ECOPETROL"], ts.colour = 'green', na.rm = TRUE)
+autoplot(PORTAFOLIO2[, "EXITO"], ts.colour = 'green', na.rm = TRUE)
+```
+
+
++ ¿Que problemas se presentan?
++ Proponga una solución y aplíquela
++ Ejecute en R el mecanismo que permita obtener los primeros y los últimos cinco meses de ECOPETROL
++ Ejecute un script en R que permita obtener el máximo valor de la serie de tiempo tanto de ECOPETROL y el EXITO
+
+
+# Referencias
+
++ Wickham, H., & Grolemund, Garrett. (2016). R for Data Science. O´Relly
++ Time Series Data in R with xts & zoo
