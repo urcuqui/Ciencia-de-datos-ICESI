@@ -1,6 +1,11 @@
 from numpy import exp, sum
 
 
+def ex(array, e):
+        for i in array:
+            print(i ** e)
+
+
 class Tools(object):
 
     def softmax(x):
@@ -25,6 +30,5 @@ class Tools(object):
         while a < 10:
             print(a)
             a, b = b, a + b
-
 
 Tools.fibonacci()
