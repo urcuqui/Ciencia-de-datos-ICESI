@@ -1,0 +1,81 @@
+---
+title: "Base de datos"
+author: "Christian Urcuqui"
+date: "11 de enero de 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+###Base de datos 
+
+Debido a la amplia gama de tecnologías de base de datos y a la importancia de procesar la mayor cantidad de información; es importante conocer los mecanismos (interfaces) con los cuales podamos integrar los distintos sistemas de información con R, ya que será el medio con el que podremos consultar y procesar los datos que serán luego utilizados en las actividades de la ciencia de datos.
+
+####MySQL
+
+<img src='https://github.com/urcuqui/Data-Science/blob/master/Utilities/mysql.jpg?raw=true' width='250' height='250'> 
+
+
+MYSQL es un sistema de gestión de base de datos relacional. Una de las tecnologías de mayor acogida en el soluciones web (por ejemplo, Joomla, Wordpress y Drupal). 
+
+Existen diversas interfaces de programación de aplicaciones que permiten el acceso a MySQL a distintos lenguajes de programación de programación, por ejemplo, C, C++, Python, Java y R.
+
+Para la interacción de R y MySQL es necesario contar el paquete RMySQL en nuestro entorno de trabajo de R. 
+Es importante tener previamente instalado el sistema de base de datos MySQL en nuestro equipo (por ejemplo, MySQL WorkBench).
+https://dev.mysql.com/downloads
+
+A continuación, se enuncian algunos comandos a tener en cuenta para la configuración y acceso de un usuario a través del paquete RMySQL. 
+
+Existen distintas formas para crear un usuario en el MySQL workbench, para nuestro caso dejaremos un ejemplo de un script en SQL para la creación de un usuario con privilegios sobre un SCHEMA
+```
+CREATE USER 'username'@'localhost' IDENTIFIED BY 'SomethingDifficult';
+GRANT SELECT, INSERT, UPDATE, DELETE, EXECUTE, SHOW VIEW ON database_name.* TO 'username'@'localhost';
+```
+Es importante que el tipo de autenticación sea tipo "Standard", para lograr esto se puede digitar el siguiente script en SQL
+```
+ALTER USER 'username'@'localhost' IDENTIFIED WITH mysql_native_password BY 'SomethingDifficult';
+```
+
+### Paquetes para MySQL
+
+Instalación de paquetes necesarios para el desarrollo de las sesiones 
+
+
+```{r paquetes, echo=FALSE}
+#install.packages("RMySQL")
+
+```
+
+Cargar los paquetes
+
+```{r cargarPaquetes}
+library(RMySQL)
+```
+
+Vamos a conectarnos a través de R a la base de datos MySQL, para ello será necesario utilizar los métodos de RMySQL para definir los datos de nuestra cuenta y contraseña.
+
+```{r conexion}
+# definición de la variable para el password
+# dbname es el nombre de la base de datos creada en el sistema de base de datos MySQL
+# host es el parámetro que define la dirección donde se encuentra hospedada la base de datos, para nuestro caso será en nuestro equipo local "localhost"
+localuserpassword <- "SomethingDifficult"
+#dbConnect es el método que nos permite conectarnos a la base de datos MySQL
+#?dbConnect
+storiesDb <- dbConnect(MySQL(), user='username', password=localuserpassword, dbname='sakila', host='localhost')
+
+# La siguiente linea despliega las tablas de la base de datos cargada
+dbListTables(storiesDb)
+
+# Vamos ahora a pasar la base de datos cargada a un data.frame,< el parámetro name define el nombre de la tabla a procesar
+actor_df <- dbReadTable(conn = storiesDb, name = 'actor')
+head(actor_df)
+
+
+# dbDisconnect es el método que nos permite terminar la conexión con la base de datos
+#?dbDisconnect
+dbDisconnect(storiesDb ) 
+
+```
